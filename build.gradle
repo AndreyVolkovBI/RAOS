@@ -1,0 +1,86 @@
+plugins {
+    id 'net.researchgate.release' version '2.6.0' apply false
+
+    id "org.jetbrains.kotlin.kapt" version "1.3.61" apply false
+    id 'org.jetbrains.kotlin.jvm' version '1.3.61' apply false
+}
+
+apply plugin: 'net.researchgate.release'
+apply plugin: 'java'
+
+ext {
+    mavenRepo = "repo"
+    mavenUser = "user"
+    mavenPassword = "password"
+}
+
+subprojects {
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+
+    repositories {
+        mavenCentral()
+    }
+
+    compileKotlin {
+        kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8
+    }
+
+    dependencies {
+        implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'
+    }
+}
+
+afterReleaseBuild.dependsOn(':templated-application:publish')
+
+configure(subprojects.findAll {
+    it.name == 'templated-application'
+}) {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+
+    release {
+        git {
+            requireBranch = 'develop|master'
+        }
+    }
+
+    sonarqube {
+        properties {
+            property "sonar.projectKey", "$rootProject.name:$project.name"
+            property "sonar.projectName", "$rootProject.name:$project.name"
+        }
+    }
+
+    task sourceJar(type: Jar) {
+        from sourceSets.main.allSource
+    }
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                version = rootProject.version
+                artifactId = project.name
+                groupId = "GROUP_ID"
+
+                from components.java
+                artifact sourceJar {
+                    classifier 'sources'
+                }
+            }
+        }
+        repositories {
+            maven {
+                url mavenRepo
+                credentials {
+                    username = mavenUser
+                    password = mavenPassword
+                }
+            }
+        }
+    }
+}
