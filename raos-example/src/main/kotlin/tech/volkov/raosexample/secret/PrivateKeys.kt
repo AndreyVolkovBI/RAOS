@@ -1,0 +1,4 @@
+package tech.volkov.raosexample.secret
+
+const val LANDLORD_PRIVATE_KEY = "b0615fdd1fe8b71a14d90314793ec46174056b94828338fb43fb200df5c60627"
+const val TENANT_PRIVATE_KEY = "31e97a65e44136055a1387059bc36c2f16d04c8fa521b6bb93498c673d1f469a"
