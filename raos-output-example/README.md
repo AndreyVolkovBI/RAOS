@@ -1,1 +1,0 @@
-# RAOS output example

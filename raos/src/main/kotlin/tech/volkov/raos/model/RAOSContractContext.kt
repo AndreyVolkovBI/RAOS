@@ -14,6 +14,9 @@ class RAOSContractContext {
     var apartment: Apartment = Apartment()
         private set
 
+    var deal: Deal = Deal()
+        private set
+
     fun landlord(init: Landlord.() -> Unit) {
         landlord = Landlord().apply(init)
     }
@@ -24,5 +27,9 @@ class RAOSContractContext {
 
     fun apartment(init: Apartment.() -> Unit) {
         apartment = Apartment().apply(init)
+    }
+
+    fun deal(init: Deal.() -> Unit) {
+        deal = Deal().apply(init)
     }
 }

@@ -12,6 +12,10 @@ abstract class ContractMember {
 class Apartment {
     lateinit var name: String
     lateinit var address: String
-    var area: Int = 0
-    var priceInWeiPerNight: Int = 0
+    var area: Long = 0
+    var priceInWeiPerNight: Long = 0
+}
+
+class Deal {
+    var priceInWei: Long = 0
 }

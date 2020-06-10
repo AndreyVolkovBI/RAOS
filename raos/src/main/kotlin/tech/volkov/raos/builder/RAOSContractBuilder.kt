@@ -7,10 +7,10 @@ import tech.volkov.raos.service.impl.RAOSServiceImpl
 private val raosService: RAOSService = RAOSServiceImpl()
 
 /**
- * Main high order function that receives [privateKey] with [block]
+ * Main high order function that receives [landlordPrivateKey], [tenantPrivateKey] with [block]
  * @return [RAOSContractContext]
  */
-fun contract(privateKey: String, block: RAOSContractContext.() -> Unit = {}) {
+fun contract(landlordPrivateKey: String, tenantPrivateKey: String, block: RAOSContractContext.() -> Unit = {}) {
     val raosContractContext = RAOSContractContext().apply { block() }
-    raosService.handleCreateContractRequest(raosContractContext)
+    raosService.processContract(landlordPrivateKey, tenantPrivateKey, raosContractContext)
 }

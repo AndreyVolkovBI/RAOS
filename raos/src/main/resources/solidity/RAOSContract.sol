@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity <0.5.1 >=0.4.20;
 
 /*
  RAOS - Rent Apartment On Solidity smart contract.
@@ -16,7 +16,7 @@ contract RAOSContract {
     struct Landlord {
         string name;
         string passport;
-        address payable landlordAddress;
+        address landlordAddress;
     }
 
     struct Apartment {
@@ -29,7 +29,7 @@ contract RAOSContract {
     struct Tenant {
         string name;
         string passport;
-        address payable tenantAddress;
+        address tenantAddress;
     }
 
     struct Deal {
@@ -54,6 +54,12 @@ contract RAOSContract {
         _;
     }
 
+    // modifier that checks that setTenant() function was called only once
+    modifier tenantOnce() {
+        require(deal.tenant.tenantAddress == 0);
+        _;
+    }
+
     // modifier for ability to call function on behalf of tenant or landlord only
     modifier contractMembersOnly() {
         require(
@@ -64,50 +70,51 @@ contract RAOSContract {
     }
 
     // set landlord available for landlord only (the account which created the contract)
-    function setLandlord(string name, string passport) landlordOnly public {
+    function setLandlord(string memory name, string memory passport) landlordOnly public {
         deal.landlord.name = name;
         deal.landlord.passport = passport;
     }
 
     // set apartment available for landlord only (the account which created the contract)
-    function setApartment(string name, uint area, string apartmentAddress) landlordOnly public {
+    function setApartment(string memory name, uint area, string memory apartmentAddress, uint256 priceInWeiPerNight) landlordOnly public {
         deal.apartment.name = name;
         deal.apartment.area = area;
         deal.apartment.apartmentAddress = apartmentAddress;
+        deal.apartment.priceInWeiPerNight = priceInWeiPerNight;
     }
 
     // set tenant available for anyone
-    function setTenant(string name, string passport) public {
+    function setTenant(string memory name, string memory passport) tenantOnce public {
         deal.tenant.name = name;
         deal.tenant.passport = passport;
         deal.tenant.tenantAddress = msg.sender;
     }
 
-    function getLandlord() contractMembersOnly public returns (string, string) {
+    function getLandlord() contractMembersOnly public view returns (string memory, string memory) {
         return (deal.landlord.name, deal.landlord.passport);
     }
 
-    function getTenant() contractMembersOnly public returns (string, string) {
+    function getTenant() contractMembersOnly public view returns (string memory, string memory) {
         return (deal.tenant.name, deal.tenant.passport);
     }
 
-    function getApartment() contractMembersOnly public returns (Apartment) {
-        return deal.apartment;
+    function getApartment() contractMembersOnly public view returns (string memory, uint, string memory, uint256) {
+        return (deal.apartment.name, deal.apartment.area, deal.apartment.apartmentAddress, deal.apartment.priceInWeiPerNight);
     }
 
-    function getDeal() contractMembersOnly public returns (uint, uint, uint, uint) {
+    function getDeal() contractMembersOnly public view returns (uint, uint, uint, uint) {
         return (deal.nightsCount, deal.totalPrice, deal.rentStartDate, deal.rentEndDate);
     }
 
-    function getRentStartDate() contractMembersOnly public returns (uint) {
+    function getRentStartDate() contractMembersOnly public view returns (uint) {
         return deal.rentStartDate;
     }
 
-    function getRentEndDate() contractMembersOnly public returns (uint) {
+    function getRentEndDate() contractMembersOnly public view returns (uint) {
         return deal.rentEndDate;
     }
 
-    function getTimeLeft() contractMembersOnly public returns (uint) {
+    function getTimeLeft() contractMembersOnly public view returns (uint) {
         return deal.rentEndDate - block.timestamp;
     }
 
@@ -126,7 +133,7 @@ contract RAOSContract {
 
             // setting nights count & total price
             deal.nightsCount = numberOfNightsPaid;
-            deal.totalPrice = msg.value - numberOfNightsPaid * deal.apartment.priceInWeiPerNight;
+            deal.totalPrice = numberOfNightsPaid * deal.apartment.priceInWeiPerNight;
 
             // setting rent dates: start & end
             deal.rentStartDate = block.timestamp;

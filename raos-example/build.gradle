@@ -1,4 +1,5 @@
 dependencies {
     implementation project(":raos")
     implementation "org.jetbrains.kotlin:kotlin-script-runtime:1.3.72"
+    implementation "io.ktor:ktor-server-netty:1.3.2"
 }

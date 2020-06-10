@@ -56,7 +56,7 @@ Basically, it was build to be as simple as possible and be readable for both com
 Here we describe all members of the contract in a pretty clear and nice structure.
 
 ```kotlin
-contract(PRIVATE_KEY) {
+contract(LANDLORD_PRIVATE_KEY, TENANT_PRIVATE_KEY) {
 
     landlord {
         name = "Ivan Ivanov"
@@ -73,6 +73,10 @@ contract(PRIVATE_KEY) {
         address = "Russia, Moscow, Petrovka st. 7, 25"
         area = 57
         priceInWeiPerNight = 10000
+    }
+
+    deal {
+        priceInWei = 9 * 10000
     }
 }
 ```
